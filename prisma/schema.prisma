@@ -14,6 +14,11 @@ enum RegistrationStatus {
   COMPLETED
 }
 
+enum CourseType {
+  COMPULSORY
+  ELECTIVE
+}
+
 enum ResultStatus {
   DRAFT
   SUBMITTED
@@ -141,6 +146,7 @@ model AcademicLevel {
   name            String                  @unique
   levelNumber     Int                     @unique
   academicRecords StudentAcademicRecord[]
+  courses         Course[]
 }
 
 model AcademicSession {
@@ -186,19 +192,26 @@ model StudentAcademicRecord {
 }
 
 model Course {
-  id            String               @id @default(cuid())
-  code          String               @unique
-  title         String
-  description   String?
-  creditUnits   Int
-  departmentId  String
-  department    Department           @relation(fields: [departmentId], references: [id])
-  assignments   CourseAssignment[]
-  registrations CourseRegistration[]
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
+  id              String             @id @default(cuid())
+  code            String             @unique
+  title           String
+  description     String?
+  creditUnits     Int
+  departmentId    String
+  academicLevelId String
+  courseType      CourseType         @default(COMPULSORY)
+  isActive        Boolean            @default(true)
+
+  department      Department         @relation(fields: [departmentId], references: [id])
+  academicLevel   AcademicLevel      @relation(fields: [academicLevelId], references: [id])
+  assignments     CourseAssignment[]
+  registrations   CourseRegistration[]
+
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
 
   @@index([departmentId])
+  @@index([academicLevelId])
 }
 
 model CourseAssignment {

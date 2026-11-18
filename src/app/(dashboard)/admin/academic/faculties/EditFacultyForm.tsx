@@ -1,0 +1,111 @@
+
+"use client";
+
+import { useActionState } from "react";
+import {
+  updateFacultyAction,
+  type FacultyActionState,
+} from "./actions";
+
+type EditFacultyFormProps = {
+  id: string;
+  name: string;
+  code: string;
+  description: string | null;
+};
+
+const initialState: FacultyActionState = {};
+
+export default function EditFacultyForm({
+  id,
+  name,
+  code,
+  description,
+}: EditFacultyFormProps) {
+  const [state, formAction, isPending] = useActionState(
+    updateFacultyAction,
+    initialState
+  );
+
+  return (
+    <details>
+      <summary className="cursor-pointer text-xs font-medium text-blue-700 hover:text-blue-900">
+        Edit
+      </summary>
+
+      <form action={formAction} className="mt-3 min-w-64 space-y-3">
+        <input type="hidden" name="id" value={id} />
+
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-700">
+            Faculty Name
+          </label>
+          <input
+            name="name"
+            defaultValue={name}
+            required
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+          />
+          {state.errors?.name?.map((error) => (
+            <p key={error} className="mt-1 text-xs text-red-600">
+              {error}
+            </p>
+          ))}
+        </div>
+
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-700">
+            Faculty Code
+          </label>
+          <input
+            name="code"
+            defaultValue={code}
+            required
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm uppercase"
+          />
+          {state.errors?.code?.map((error) => (
+            <p key={error} className="mt-1 text-xs text-red-600">
+              {error}
+            </p>
+          ))}
+        </div>
+
+        <div>
+          <label className="mb-1 block text-xs font-medium text-slate-700">
+            Description
+          </label>
+          <textarea
+            name="description"
+            defaultValue={description ?? ""}
+            rows={3}
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+          />
+          {state.errors?.description?.map((error) => (
+            <p key={error} className="mt-1 text-xs text-red-600">
+              {error}
+            </p>
+          ))}
+        </div>
+
+        {state.message && (
+          <p
+            role="status"
+            className={`text-xs ${
+              state.success ? "text-green-700" : "text-red-600"
+            }`}
+          >
+            {state.message}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={isPending}
+          className="rounded-md bg-blue-700 px-4 py-2 text-xs font-medium text-white hover:bg-blue-800 disabled:opacity-60"
+        >
+          {isPending ? "Saving..." : "Save Changes"}
+        </button>
+      </form>
+    </details>
+  );
+}
